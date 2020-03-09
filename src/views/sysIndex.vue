@@ -7,7 +7,6 @@
     </div>
 </template>
 <script>
-import {home} from './../service/index'
 export default {
     data(){
         return {

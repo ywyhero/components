@@ -97,48 +97,6 @@
             :info="dialogInfo"
             @closeDialog="closeDialog"
             @getTeacherList="getTeacherList"></update-teacher-info>
-
-        <!-- 批量导入老师信息 -->
-        <el-dialog 
-            title="批量导入老师信息" 
-            class="import-dialog"
-            width="500px"
-            :visible.sync="importDialogShow"
-            @close="closeImportDialog">
-            <div class="bd">
-                <div class="info" >
-                    <p class="" v-if="importStatus === 0">注意：批量导入需按本系统标准模板填写，请先下载<a class="btn-download" :href="xlsxTemp" download="老师信息模板" target="_blank">老师信息模板</a></p>
-                    <p class="" v-if="importStatus === 1">正在导入中...</p>
-                    <p class="" v-if="importStatus === 2">共<span>{{batchImportData.length}}</span>条数据，成功导入{{batchImportData.length}}条。</p>
-                    <div class="error-box" v-if="importStatus === -1">
-                        <ul class="error-list" >
-                            <li class="item" v-for="(error, index) in errorList" :key="index">{{error}}</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div slot="footer" class="footer">
-                <button 
-                    v-if="importStatus === 0 || importStatus === -1"
-                    class="btn-cancel" 
-                    @click="closeImportDialog">取消</button>
-                <button 
-                    v-if="importStatus === 0 || importStatus === -1"
-                    class="btn-ok" 
-                    @click="readyBatchImport">直接导入</button>
-                <button 
-                    v-if="importStatus === 2"
-                    class="btn-ok" 
-                    @click="closeImportDialog">确定</button>
-                <input 
-                    ref="$batchImport"
-                    class="btn-import" 
-                    @change="changeImportFile"
-                    type="file"
-                    accept=".xls, .xlsx"
-                    value="上传文件" />
-            </div>
-        </el-dialog>
     </div>
 </template>
 
@@ -148,7 +106,6 @@ import { teacher } from '../../service'
 import { format } from '../../util/time'
 import { mapGetters } from 'vuex'
 import env from '../../config/env';
-import { teacherInfo } from '../../util/mapList';
 import XLSX from 'xlsx';
 
 export default {
@@ -442,29 +399,6 @@ export default {
          */
         readyBatchImport (e) {
             this.$refs.$batchImport.click();
-        },
-        /**
-         * @description     每次选择新文件时回调
-         */
-        changeImportFile (e) {
-            let target = e.target;
-            let files = target.files;
-            this.batchImportData = [];
-            this.excel2Json(files, (fileData) => {
-                if (fileData && fileData.length) {
-                    fileData = fileData.map(row => {
-                        let file = {}
-                        for (let [key, value] of Object.entries(row)) {
-                            file[teacherInfo[key]] = value;
-                        }
-                        return file;
-                    });
-                    // 开始上传
-                    if (fileData.length) {
-                        this.importStatus = 1;
-                    }
-                }
-            });
         },
         /**
          * @description     excel数据转换为json

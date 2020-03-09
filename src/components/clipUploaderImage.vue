@@ -37,7 +37,6 @@
 </template>
 
 <script>
-let moveFlag=false; // 是否可以拖动
 let canvas = null
 let maskCanvas = null;
 let maskCtx = null;
